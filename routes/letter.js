@@ -21,4 +21,13 @@ router.post('/',async(req,res)=>{
     }
 })
 
+//모든 편지 조회
+router.get('/',async(req,res)=>{
+    try{
+        const letters=await Letter.findAll()
+        return res.status(200).json(letters)
+    }catch(error){
+        return res.status(500).json({error : 'Error reading all letters'})
+    }
+})
 module.exports=router
