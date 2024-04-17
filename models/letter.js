@@ -24,7 +24,7 @@ const Letters=(sequelize)=>{
             type:DataTypes.STRING(500),
             allowNull:false,
         },
-        musice_id:{
+        music_id:{
             type:DataTypes.INTEGER,
             references:{
                 model:'music',
