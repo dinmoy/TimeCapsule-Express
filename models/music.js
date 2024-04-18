@@ -1,5 +1,4 @@
-const sequelize = require('sequelize')
-const {DataType}=require('sequelize')
+const {DataTypes}=require('sequelize')
 
 const Music=(sequelize)=>{
   return sequelize.define('Music',{

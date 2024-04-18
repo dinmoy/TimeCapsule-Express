@@ -13,7 +13,7 @@ const Letters=(sequelize)=>{
             allowNull:false,
         },
         email:{
-            type:DataType.STRING(255),
+            type:DataTypes.STRING(255),
             allowNull:false,
         },
         content:{
@@ -24,7 +24,7 @@ const Letters=(sequelize)=>{
             type:DataTypes.STRING(500),
             allowNull:false,
         },
-        musice_id:{
+        music_id:{
             type:DataTypes.INTEGER,
             references:{
                 model:'music',
