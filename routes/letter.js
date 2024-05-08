@@ -78,6 +78,18 @@ router.get('/', async (req, res) => {
     }
 })
 
+//캡슐 전체 조회
+router.get('/capsule',async(req,res)=>{
+    try{
+        const capsules=await Letter.findAll({
+            attributes:['capsule']
+        })
+        return res.status(200).json(capsules)
+    }catch(error){
+        return res.status(500).json({error: 'Error reading all capsuleImages'})
+    }
+})
+
 //편지Id로 특정 편지 조회
 router.get('/:id', async (req, res) => {
     try {
@@ -92,6 +104,5 @@ router.get('/:id', async (req, res) => {
         return res.status(500).json({ error: 'Error reading letter' })
     }
 })
-
 
 module.exports = router
