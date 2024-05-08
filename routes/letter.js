@@ -1,7 +1,54 @@
 const express = require('express')
 const { Letter } = require('../models')
-
+const multer=require('multer')
+const path=require('path')
+const fs= require('fs')
 const router = express.Router()
+
+const storage=multer.diskStorage({
+    destination:function(req,file,cb){
+        const uploadPath='uploads/'
+        if(!fs.existsSync(uploadPath)){
+            fs.mkdirSync(uploadPath)
+        }
+        cb(null,uploadPath)
+    },
+    filename:function(req,file,cb){
+        cb(null,Date.now()+path.extname(file.originalname))
+    },
+})
+const upload=multer({storage})
+
+//캡슐 이미지 업로드
+router.post('/capsule',upload.single('capsuleImage'),async(req,res)=>{
+    try{
+        const {filename,path:filePath}=req.file
+
+        const letterId=req.body.letterId
+        const letter=await Letter.findByPk(letterId)
+        if(letter){
+            letter.capsule=path.relative(path.join(__dirname,'..'),filePath)
+            await letter.save()
+            res.status(200).json({
+                success:true,
+                message:'CapsuleImage uploaded successfully',
+                capsule:letter.capsule
+            })
+        }else{
+            res.status(404).json({
+                success:false,
+                message:'Letter not found'
+            })
+        }
+    }catch(error){
+        console.log(error)
+        res.status(500).json({
+            success:false,
+            message:'Error uploading capsuleImage'
+
+        })
+    }
+})
 
 //편지 생성
 router.post('/', async (req, res) => {
