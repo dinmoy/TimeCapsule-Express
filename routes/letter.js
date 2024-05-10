@@ -3,6 +3,7 @@ const { Letter } = require('../models')
 const multer=require('multer')
 const path=require('path')
 const fs= require('fs')
+const mailer=require('./mailSender')
 const router = express.Router()
 
 const storage=multer.diskStorage({
@@ -53,7 +54,7 @@ router.post('/capsule',upload.single('capsuleImage'),async(req,res)=>{
 //편지 생성
 router.post('/', async (req, res) => {
     try {
-        const { recipient, email, content, capsule, music_id } = req.body
+        const { recipient, email, content,capsule,music_id } = req.body
         const newLetter = await Letter.create({
             recipient,
             email,
@@ -65,6 +66,24 @@ router.post('/', async (req, res) => {
     } catch (error) {
         console.log(error)
         return res.status(500).json({ error: 'Error create letter' })
+    }
+})
+
+router.get('/mail', async (req, res) => {
+    try {
+        const users = await Letter.findAll()
+        for (const user of users) {
+            const emailParam = {
+                toEmail: user.email,
+                subject: 'TimeCapsule',
+                text: `${user.email}님에게`,
+            }
+            await mailer.sendEmail(emailParam)
+        }
+        return res.status(200).json({ message: 'Success sending Email' })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: 'Error sending Email' })
     }
 })
 
