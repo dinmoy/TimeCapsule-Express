@@ -4,6 +4,7 @@ const multer=require('multer')
 const path=require('path')
 const fs= require('fs')
 const mailer=require('./mailSender')
+const cron=require('node-cron')
 const router = express.Router()
 
 const storage=multer.diskStorage({
@@ -69,7 +70,7 @@ router.post('/', async (req, res) => {
     }
 })
 
-router.get('/mail', async (req, res) => {
+const sendEmails = async () => {
     try {
         const users = await Letter.findAll()
         for (const user of users) {
@@ -80,12 +81,14 @@ router.get('/mail', async (req, res) => {
             }
             await mailer.sendEmail(emailParam)
         }
-        return res.status(200).json({ message: 'Success sending Email' })
+        console.log('Success sending Email')
     } catch (error) {
-        console.log(error);
-        return res.status(500).json({ error: 'Error sending Email' })
-    }
-})
+        console.log('Error sending Email:', error)
+    }   
+}
+
+cron.schedule('0 0 0 1 1 *', sendEmails);
+
 
 //모든 편지 조회
 router.get('/', async (req, res) => {
