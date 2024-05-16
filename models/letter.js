@@ -10,15 +10,12 @@ const Letters=(sequelize)=>{
         },
         recipient:{
             type:DataTypes.STRING(20),
-            allowNull:false,
         },
         email:{
             type:DataTypes.STRING(255),
-            allowNull:false,
         },
         content:{
             type:DataTypes.STRING(500),
-            allowNull:false,
         },
         capsule:{
             type:DataTypes.STRING(500),
@@ -30,7 +27,6 @@ const Letters=(sequelize)=>{
                 model:'music',
                 key:'id',
             },
-            allowNull:false,
         },
     })
 }
