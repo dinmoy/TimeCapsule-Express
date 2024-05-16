@@ -43,18 +43,16 @@ router.post('/capsule', upload.single('capsuleImage'), async (req, res) => {
     }
 })
 
-//편지 생성
-router.post('/', async (req, res) => {
+//편지 업데이트
+router.patch('/:id', async (req, res) => {
     try {
-        const { recipient, email, content, capsule, music_id } = req.body
-        const newLetter = await Letter.create({
-            recipient,
-            email,
-            content,
-            capsule,
-            music_id,
+        const letterId=req.params.id
+        const { recipient, email, content } = req.body
+        const newLetter = await Letter.update(
+            {recipient, email,content },
+            {where:{id:letterId}
         })
-        return res.status(200).json(newLetter);
+        return res.status(200).json();
     } catch (error) {
         console.log(error)
         return res.status(500).json({ error: 'Error create letter' })
