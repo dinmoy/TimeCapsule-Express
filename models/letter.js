@@ -28,6 +28,10 @@ const Letters=(sequelize)=>{
                 key:'id',
             },
         },
+        emailSent:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false,
+        }
     })
 }
 module.exports=Letters
