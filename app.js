@@ -1,26 +1,29 @@
 const express = require('express');
-const sequelize= require('./config/database');
+const cors = require('cors');
+const path = require('path');
+const { sequelize } = require('./models');
+const musicRouter = require('./routes/music');
+const uploadFiles = require('./scripts/uploadMusic');
+
 const app = express();
 const port = 3000;
 
-const letterRouter = require('./routes/letter');
-
+app.use(cors());
 app.use(express.json());
-app.use('/letters', letterRouter);
 
-sequelize.sync()
-    .then(() => {
-        console.log('Database synced')
+app.use('/img', express.static(path.join(__dirname, 'img')));
+app.use('/music', express.static(path.join(__dirname, 'music')));
+
+app.use('/music', musicRouter);
+
+sequelize.sync({ force: true })
+    .then(async () => {
+        console.log('Database synchronized');
+        await uploadFiles();
+        app.listen(port, () => {
+            console.log(`Server is running on http://localhost:${port}`);
+        });
     })
-    .catch((err) => {
-        console.error('Error syncing database:', err)
+    .catch((error) => {
+        console.error('Error syncing database:', error);
     });
-
-
-app.get('/', (req, res) => {
-    res.send('Time Capsule!')
-})
-
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
