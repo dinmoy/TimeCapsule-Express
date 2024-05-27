@@ -47,7 +47,7 @@ router.post('/capsule', upload.single('capsuleImage'), async (req, res) => {
 router.patch('/:id', async (req, res) => {
     try {
         const letterId=req.params.id
-        const { recipient, email, content } = req.body
+        const { recipient, email, content} = req.body
         const newLetter = await Letter.update(
             {recipient, email,content },
             {where:{id:letterId}
@@ -59,28 +59,53 @@ router.patch('/:id', async (req, res) => {
     }
 })
 
-// const sendEmails = async () => {
-//     try {
-//         const users = await Letter.findAll({where: {emailSent:false}})
-//         for (const user of users) {
-//             const url=createUrl(user.id)
-//             const emailParam = {
-//                 toEmail: user.email,
-//                 subject: 'TimeCapsule',
-//                 text: `${user.email}님에게`
-//             }
-//             await mailer.sendEmail(emailParam)
+// 편지의 노래 컬럼 업데이트
+router.patch('/:id/music',async(req,res)=>{
+    try{
+        const letterId=req.params.id
+        const {music_id}=req.body
+        const updateLetter=await Letter.update(
+            {music_id},
+            {where:{id:letterId}}
+        )
+        return res.status(200).json()
+    }catch(error){
+        console.log(error)
+        return res.status(500).json({error: 'Error update letter with music'})
+    }
+})
 
-//             user.emailSent=true
-//             await user.save()
-//             console.log('Success sending Email')
-//         }
-//     } catch (error) {
-//         console.log('Error sending Email:', error)
-//     }
-// }
+const sendEmails = async () => {
+    try {
+        const users = await Letter.findAll({ where: { emailSent: 0 } });
+        for (const user of users) {
+            const emailParam = {
+                toEmail: user.email,
+                subject: 'TimeCapsule',
+                text: `${user.email}님에게`,
+            }
+            
+            //이메일 주소 유효성 검사 / 이메일 주소가 없으면 스킵
+            if (!emailParam.toEmail) {
+                console.log('No email recipient defined for user:', user.id)
+                continue
+            }
 
-// cron.schedule('1 20 10 24 5  *', sendEmails);
+            try {
+                await mailer.sendEmail(emailParam)
+                user.emailSent = 1
+                await user.save()
+                console.log('Success send Email:', user.email)
+            } catch (error) {
+                console.log('Error send Email:', user.email, ':', error)
+            }
+        }
+    } catch (error) {
+        console.log('Error send Emails:', error)
+    }
+}
+
+cron.schedule('1 0 0 1 1 *', sendEmails);
 
 
 //모든 편지 조회
