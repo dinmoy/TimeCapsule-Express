@@ -59,6 +59,22 @@ router.patch('/:id', async (req, res) => {
     }
 })
 
+// 편지의 노래 컬럼 업데이트
+router.patch('/:id/music',async(req,res)=>{
+    try{
+        const letterId=req.params.id
+        const {music_id}=req.body
+        const updateLetter=await Letter.update(
+            {music_id},
+            {where:{id:letterId}}
+        )
+        return res.status(200).json()
+    }catch(error){
+        console.log(error)
+        return res.status(500).json({error: 'Error update letter with music'})
+    }
+})
+
 const sendEmails = async () => {
     try {
         const users = await Letter.findAll({ where: { emailSent: 0 } });
