@@ -59,28 +59,28 @@ router.patch('/:id', async (req, res) => {
     }
 })
 
-const sendEmails = async () => {
-    try {
-        const users = await Letter.findAll({where: {emailSent:false}})
-        for (const user of users) {
-            const url=createUrl(user.id)
-            const emailParam = {
-                toEmail: user.email,
-                subject: 'TimeCapsule',
-                text: `${user.email}님에게`
-            }
-            await mailer.sendEmail(emailParam)
+// const sendEmails = async () => {
+//     try {
+//         const users = await Letter.findAll({where: {emailSent:false}})
+//         for (const user of users) {
+//             const url=createUrl(user.id)
+//             const emailParam = {
+//                 toEmail: user.email,
+//                 subject: 'TimeCapsule',
+//                 text: `${user.email}님에게`
+//             }
+//             await mailer.sendEmail(emailParam)
 
-            user.emailSent=true
-            await user.save()
-            console.log('Success sending Email')
-        }
-    } catch (error) {
-        console.log('Error sending Email:', error)
-    }
-}
+//             user.emailSent=true
+//             await user.save()
+//             console.log('Success sending Email')
+//         }
+//     } catch (error) {
+//         console.log('Error sending Email:', error)
+//     }
+// }
 
-cron.schedule('1 20 10 24 5  *', sendEmails);
+// cron.schedule('1 20 10 24 5  *', sendEmails);
 
 
 //모든 편지 조회
