@@ -4,7 +4,7 @@ const path = require('path');
 const { sequelize } = require('./models');
 const musicRouter = require('./routes/music');
 const uploadFiles = require('./scripts/uploadMusic');
-
+const letterRouter = require('./routes/letter');
 const app = express();
 const port = 3000;
 
@@ -15,6 +15,7 @@ app.use('/img', express.static(path.join(__dirname, 'img')));
 app.use('/music', express.static(path.join(__dirname, 'music')));
 
 app.use('/music', musicRouter);
+app.use('/letters', letterRouter);
 
 sequelize.sync({ force: true })
     .then(async () => {
