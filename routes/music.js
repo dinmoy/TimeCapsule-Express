@@ -13,15 +13,24 @@ router.get('/', async (req, res) => {
     }
 });
 
-// 음악 제목으로 검색하는 엔드포인트
+// 음악 제목 또는 가수 이름으로 검색하는 엔드포인트
 router.get('/search', async (req, res) => {
-    const { title } = req.query;
+    const { query } = req.query;
     try {
         const musicList = await Music.findAll({ 
             where: {
-                title: {
-                    [Op.like]: `%${title}%`
-                }
+                [Op.or]: [
+                    {
+                        title: {
+                            [Op.like]: `%${query}%`
+                        }
+                    },
+                    {
+                        artist: {
+                            [Op.like]: `%${query}%`
+                        }
+                    }
+                ]
             } 
         });
         if (musicList.length === 0) {

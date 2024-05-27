@@ -20,6 +20,10 @@ const Music = (sequelize) => {
             type: DataTypes.STRING(500),
             allowNull: false,
         },
+        artist: {
+            type: DataTypes.STRING(255),
+            allowNull: false,
+        },
     }, {
         timestamps: false  // createdAt과 updatedAt을 생성하지 않도록 설정
     });

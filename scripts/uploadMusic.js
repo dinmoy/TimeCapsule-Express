@@ -16,30 +16,48 @@ const removeExtension = (filename) => {
     return filename.replace(/\.[^/.]+$/, "");
 };
 
+// 파일 이름에서 가수와 제목을 분리하는 함수 ("artist-title" 형식 가정)
+const extractArtistAndTitle = (filename) => {
+    const [artist, ...titleParts] = filename.split('-');
+    const title = titleParts.join('-').trim();
+    return { artist: artist.trim(), title: title.trim() };
+};
+
 // 파일을 데이터베이스에 저장
 async function uploadFiles() {
     try {
-        await sequelize.sync();  // 테이블 생성
+        await sequelize.sync();  // 테이블 생성 (필요 시)
 
         for (let i = 0; i < musicFiles.length; i++) {
             const musicFile = musicFiles[i];
-            const musicTitle = removeExtension(musicFile);
-            const imgFile = imgFiles.find(file => removeExtension(file) === musicTitle);
+            const { artist, title } = extractArtistAndTitle(removeExtension(musicFile));
+            const imgFile = imgFiles.find(file => {
+                const { artist: imgArtist, title: imgTitle } = extractArtistAndTitle(removeExtension(file));
+                return imgArtist === artist && imgTitle === title;
+            });
 
             if (imgFile) {
                 // 절대 경로 대신 상대 경로를 저장
                 const musicPath = `/music/${musicFile}`;
                 const imgPath = `/img/${imgFile}`;
 
-                await Music.create({
-                    title: musicTitle,
-                    music_img_path: imgPath, // 상대 경로로 저장
-                    music_file: musicPath // 상대 경로로 저장
-                });
+                // 데이터베이스에 동일한 제목과 가수가 있는 음악이 이미 있는지 확인
+                const existingMusic = await Music.findOne({ where: { title, artist } });
 
-                console.log(`업로드 : ${musicTitle}`);
+                if (!existingMusic) {
+                    await Music.create({
+                        title,
+                        artist,
+                        music_img_path: imgPath, // 상대 경로로 저장
+                        music_file: musicPath // 상대 경로로 저장
+                    });
+
+                    console.log(`업로드 : ${title}-${artist}`);
+                } else {
+                    console.log(`이미 존재 : ${title}-${artist}`);
+                }
             } else {
-                console.log(`매칭 이미지 찾기 불가: ${musicTitle}`);
+                console.log(`매칭 이미지 찾기 불가: ${title}-${artist}`);
             }
         }
 
