@@ -7,6 +7,7 @@ const uploadFiles = require('./scripts/uploadMusic');
 const letterRouter = require('./routes/letter');
 const app = express();
 const port = 3000;
+const host='3.34102.177'
 
 app.use(cors());
 app.use(express.json());
@@ -22,7 +23,7 @@ sequelize.sync({ force: true })
         console.log('Database synchronized');
         await uploadFiles();
         app.listen(port, () => {
-            console.log(`Server is running on http://localhost:${port}`);
+            console.log(`Server is running on http://${host}:${port}`);
         });
     })
     .catch((error) => {
