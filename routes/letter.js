@@ -1,5 +1,5 @@
 const express = require('express')
-const { Letter } = require('../models')
+const { Letter,Music } = require('../models')
 const multer = require('multer')
 const path = require('path')
 const fs = require('fs')
@@ -48,6 +48,12 @@ router.patch('/:id', async (req, res) => {
     try {
         const letterId=req.params.id
         const { recipient, email, content} = req.body
+
+        const letter = await Letter.findByPk(letterId);
+        if (!letter) {
+            return res.status(404).json({ error: 'Letter not found'})
+        }
+
         const newLetter = await Letter.update(
             {recipient, email,content },
             {where:{id:letterId}
@@ -64,6 +70,17 @@ router.patch('/:id/music',async(req,res)=>{
     try{
         const letterId=req.params.id
         const {music_id}=req.body
+
+        const letter = await Letter.findByPk(letterId);
+        if (!letter) {
+            return res.status(404).json({ error: 'Letter not found'})
+        }
+
+        const music = await Music.findByPk(music_id)
+        if (!music) {
+            return res.status(404).json({ error: 'Music not found'})
+        }
+
         const updateLetter=await Letter.update(
             {music_id},
             {where:{id:letterId}}
