@@ -9,7 +9,7 @@ const router = express.Router()
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const uploadPath = 'uploads/'
+        const uploadPath = 'uploads/capsules'
         if (!fs.existsSync(uploadPath)) {
             fs.mkdirSync(uploadPath)
         }
@@ -43,7 +43,7 @@ router.post('/capsule', upload.single('capsuleImage'), async (req, res) => {
     }
 })
 
-//편지 업데이트
+//편지 작성
 router.patch('/:id', async (req, res) => {
     try {
         const letterId=req.params.id
@@ -65,7 +65,7 @@ router.patch('/:id', async (req, res) => {
     }
 })
 
-// 편지의 노래 컬럼 업데이트
+// 편지의 노래 업데이트
 router.patch('/:id/music',async(req,res)=>{
     try{
         const letterId=req.params.id
@@ -92,6 +92,7 @@ router.patch('/:id/music',async(req,res)=>{
     }
 })
 
+// 자동 이메일 발송
 const sendEmails = async () => {
     try {
         const users = await Letter.findAll({ where: { emailSent: 0 } });
