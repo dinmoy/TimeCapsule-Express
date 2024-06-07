@@ -1,13 +1,13 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+require('dotenv').config();
 const { sequelize } = require('./models');
 const musicRouter = require('./routes/music');
 const uploadFiles = require('./scripts/uploadMusic');
 const letterRouter = require('./routes/letter');
 const app = express();
 const port = 3000;
-const host='3.34102.177'
 
 app.use(cors());
 app.use(express.json());
@@ -23,7 +23,7 @@ sequelize.sync({ force: true })
         console.log('Database synchronized');
         await uploadFiles();
         app.listen(port, () => {
-            console.log(`Server is running on http://${host}:${port}`);
+            console.log(`Server is running on http://${process.env.HOST}:${port}`);
         });
     })
     .catch((error) => {
