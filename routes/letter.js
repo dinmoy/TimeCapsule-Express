@@ -100,7 +100,7 @@ const sendEmails = async () => {
             const emailParam = {
                 toEmail: user.email,
                 subject: 'TimeCapsule',
-                text: `${user.email}님에게`,
+                    
             }
             
             //이메일 주소 유효성 검사 / 이메일 주소가 없으면 스킵
