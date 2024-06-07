@@ -1,5 +1,5 @@
 const express = require('express')
-const { Letter } = require('../models')
+const { Letter,Music } = require('../models')
 const multer = require('multer')
 const path = require('path')
 const fs = require('fs')
@@ -9,7 +9,7 @@ const router = express.Router()
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const uploadPath = 'uploads/'
+        const uploadPath = 'uploads/capsules'
         if (!fs.existsSync(uploadPath)) {
             fs.mkdirSync(uploadPath)
         }
@@ -43,11 +43,17 @@ router.post('/capsule', upload.single('capsuleImage'), async (req, res) => {
     }
 })
 
-//편지 업데이트
+//편지 작성
 router.patch('/:id', async (req, res) => {
     try {
         const letterId=req.params.id
         const { recipient, email, content} = req.body
+
+        const letter = await Letter.findByPk(letterId);
+        if (!letter) {
+            return res.status(404).json({ error: 'Letter not found'})
+        }
+
         const newLetter = await Letter.update(
             {recipient, email,content },
             {where:{id:letterId}
@@ -59,11 +65,22 @@ router.patch('/:id', async (req, res) => {
     }
 })
 
-// 편지의 노래 컬럼 업데이트
+// 편지의 노래 업데이트
 router.patch('/:id/music',async(req,res)=>{
     try{
         const letterId=req.params.id
         const {music_id}=req.body
+
+        const letter = await Letter.findByPk(letterId);
+        if (!letter) {
+            return res.status(404).json({ error: 'Letter not found'})
+        }
+
+        const music = await Music.findByPk(music_id)
+        if (!music) {
+            return res.status(404).json({ error: 'Music not found'})
+        }
+
         const updateLetter=await Letter.update(
             {music_id},
             {where:{id:letterId}}
@@ -75,6 +92,7 @@ router.patch('/:id/music',async(req,res)=>{
     }
 })
 
+// 자동 이메일 발송
 const sendEmails = async () => {
     try {
         const users = await Letter.findAll({ where: { emailSent: 0 } });
@@ -82,7 +100,7 @@ const sendEmails = async () => {
             const emailParam = {
                 toEmail: user.email,
                 subject: 'TimeCapsule',
-                text: `${user.email}님에게`,
+                    
             }
             
             //이메일 주소 유효성 검사 / 이메일 주소가 없으면 스킵
