@@ -97,10 +97,12 @@ const sendEmails = async () => {
     try {
         const users = await Letter.findAll({ where: { emailSent: 0 } });
         for (const user of users) {
+            const url = `https://dinmoy8761.tistory.com/${user.id}`
             const emailParam = {
                 toEmail: user.email,
                 subject: 'TimeCapsule',
-                    
+                html: `<h3>TimeCapsule</h3><p>아래 링크를 눌러 작년에 쓴 나의 편지를 확인해보세요</p><a href="${url}">📨 나의 편지 확인하러 가기</a>`+
+                '<img src="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2Fbk6uhT%2FbtsHQSGPq1T%2Fk5JoB3bMkodPiITDtVlhFk%2Fimg.png"/>',    
             }
             
             //이메일 주소 유효성 검사 / 이메일 주소가 없으면 스킵
@@ -123,7 +125,7 @@ const sendEmails = async () => {
     }
 }
 
-cron.schedule('1 0 0 1 1 *', sendEmails);
+cron.schedule('1 * * * * *', sendEmails);
 
 
 //모든 편지 조회
