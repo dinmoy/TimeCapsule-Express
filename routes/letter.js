@@ -9,13 +9,24 @@ const router = express.Router()
 const crypto = require('crypto')
 
 const secretKey = process.env.SECRET_KEY
+const iv = crypto.randomBytes(16)
+
 //암호화
 const encrypt = (text) => {
-    const iv = crypto.randomBytes(16)
-    const cipher = crypto.createCipheriv(aes-256-cbc, Buffer.from(secretKey), iv)
+    const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(secretKey), iv)
     let encrypted = cipher.update(text, 'utf8', 'hex')
     encrypted += cipher.final('hex')
     return iv.toString('hex') + ':' + encrypted
+}
+//복호화
+const decrypt = (text) => {
+    const parts = text.split(':')
+    const iv = Buffer.from(parts[0], 'hex')
+    const encryptedText = Buffer.from(parts[1], 'hex')
+    const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(secretKey), iv)
+    let decrypted = decipher.update(encryptedText)
+    decrypted += decipher.final()
+    return decrypted
 }
 
 const storage = multer.diskStorage({
@@ -164,10 +175,11 @@ router.get('/capsule', async (req, res) => {
 })
 
 //편지Id로 특정 편지 조회
-router.get('/:id', async (req, res) => {
+router.get('/:encryptedId', async (req, res) => {
     try {
-        const letterId = req.params.id
-        const letter = await Letter.findByPk(letterId)
+        const encryptedLetterId = req.params.encryptedId;
+        const letterId = decrypt(encryptedLetterId); // 복호화하여 실제 letterId 얻기
+        const letter = await Letter.findByPk(letterId);
         if (letter) {
             return res.status(200).json(letter)
         } else {
@@ -175,7 +187,9 @@ router.get('/:id', async (req, res) => {
         }
     } catch (error) {
         return res.status(500).json({ error: 'Error reading letter' })
+        console.log(error)
     }
 })
+
 
 module.exports = router
