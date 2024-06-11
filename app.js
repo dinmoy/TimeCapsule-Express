@@ -7,7 +7,7 @@ const musicRouter = require('./routes/music');
 const uploadFiles = require('./scripts/uploadMusic');
 const letterRouter = require('./routes/letter');
 const app = express();
-const port = 3000;
+const port = 3001;
 
 app.use(cors());
 app.use(express.json());

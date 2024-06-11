@@ -6,6 +6,17 @@ const fs = require('fs')
 const mailer = require('./mailSender')
 const cron = require('node-cron')
 const router = express.Router()
+const crypto = require('crypto')
+
+const secretKey = process.env.SECRET_KEY
+//암호화
+const encrypt = (text) => {
+    const iv = crypto.randomBytes(16)
+    const cipher = crypto.createCipheriv(aes-256-cbc, Buffer.from(secretKey), iv)
+    let encrypted = cipher.update(text, 'utf8', 'hex')
+    encrypted += cipher.final('hex')
+    return iv.toString('hex') + ':' + encrypted
+}
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -97,7 +108,9 @@ const sendEmails = async () => {
     try {
         const users = await Letter.findAll({ where: { emailSent: 0 } });
         for (const user of users) {
-            const url = `https://dinmoy8761.tistory.com/${user.id}`
+            const encryptedUserId = encrypt(user.id.toString())
+            const url = `https://dinmoy8761.tistory.com/${encryptedUserId}`
+            console.log(url)
             const emailParam = {
                 toEmail: user.email,
                 subject: 'TimeCapsule',
