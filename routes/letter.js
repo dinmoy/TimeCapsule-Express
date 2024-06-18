@@ -166,7 +166,7 @@ router.get('/', async (req, res) => {
 router.get('/capsule', async (req, res) => {
     try {
         const capsules = await Letter.findAll({
-            attributes: ['capsule']
+            attributes: ['id','capsule']
         })
         return res.status(200).json(capsules)
     } catch (error) {
