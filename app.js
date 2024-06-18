@@ -14,6 +14,7 @@ app.use(express.json());
 
 app.use('/img', express.static(path.join(__dirname, 'img')));
 app.use('/music', express.static(path.join(__dirname, 'music')));
+app.use('/uploads/capsules',express.static(path.join(__dirname, 'capsuleImage')));
 
 app.use('/music', musicRouter);
 app.use('/letters', letterRouter);
