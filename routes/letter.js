@@ -54,7 +54,7 @@ router.post('/capsule', upload.single('capsuleImage'), async (req, res) => {
         res.status(200).json({
             success: true,
             message: 'CapsuleImage uploaded successfully',
-            capsule: letter.capsuleImage 
+            capsule: letter.capsule
         })
     } catch (error) {
         console.log(error)
