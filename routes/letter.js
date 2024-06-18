@@ -174,6 +174,40 @@ router.get('/capsule', async (req, res) => {
     }
 })
 
+// 캡슐 ID로 이미지 조회
+router.get('/capsule/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const capsule = await Letter.findOne({
+            where: { id },
+            attributes: ['id','capsule']
+        })
+
+        if (!capsule) {
+            return res.status(404).json({ error: 'Capsule not found' })
+        }
+
+        return res.status(200).json(capsule)
+    } catch (error) {
+        return res.status(500).json({ error: 'Error reading capsule by ID' })
+    }
+})
+
+
+// 최신 순으로 30개 캡슐 조회
+router.get('/capsules/latest', async (req, res) => {
+    try {
+        const capsules = await Letter.findAll({
+            limit: 30,
+            order: [['createdAt', 'DESC']],
+            attributes: ['id', 'capsule']
+        })
+        return res.status(200).json(capsules)
+    } catch (error) {
+        return res.status(500).json({ error: 'Error reading latest capsules' })
+    }
+})
+
 //편지Id로 특정 편지 조회
 router.get('/:encryptedId', async (req, res) => {
     try {
