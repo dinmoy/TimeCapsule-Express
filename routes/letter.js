@@ -209,11 +209,12 @@ router.get('/capsules/latest', async (req, res) => {
 })
 
 //편지Id로 특정 편지 조회
-router.get('/:encryptedId', async (req, res) => {
+router.get('/:id', async (req, res) => {
     try {
-        const encryptedLetterId = req.params.encryptedId;
-        const letterId = decrypt(encryptedLetterId); // 복호화하여 실제 letterId 얻기
-        const letter = await Letter.findByPk(letterId);
+        // const encryptedLetterId = req.params.encryptedId;
+        // const letterId = decrypt(encryptedLetterId); // 복호화하여 실제 letterId 얻기
+        const {id}= req.params;
+        const letter = await Letter.findByPk(id);
         if (letter) {
             return res.status(200).json(letter)
         } else {
@@ -221,7 +222,6 @@ router.get('/:encryptedId', async (req, res) => {
         }
     } catch (error) {
         return res.status(500).json({ error: 'Error reading letter' })
-        console.log(error)
     }
 })
 
