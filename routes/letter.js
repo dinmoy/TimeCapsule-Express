@@ -88,31 +88,32 @@ router.patch('/:id', async (req, res) => {
 })
 
 // 편지의 노래 업데이트
-router.patch('/:id/music',async(req,res)=>{
-    try{
-        const letterId=req.params.id
-        const {music_id}=req.body
+router.put('/:id/music', async (req, res) => {
+    try {
+        const letterId = req.params.id
+        const { music_id } = req.body
 
-        const letter = await Letter.findByPk(letterId);
+        const letter = await Letter.findByPk(letterId)
         if (!letter) {
-            return res.status(404).json({ error: 'Letter not found'})
+            return res.status(404).json({ error: 'Letter not found' })
         }
 
         const music = await Music.findByPk(music_id)
         if (!music) {
-            return res.status(404).json({ error: 'Music not found'})
+            return res.status(404).json({ error: 'Music not found' })
         }
 
-        const updateLetter=await Letter.update(
-            {music_id},
-            {where:{id:letterId}}
+        const updateLetter = await Letter.update(
+            { music_id },
+            { where: { id: letterId } }
         )
         return res.status(200).json()
-    }catch(error){
+    } catch (error) {
         console.log(error)
-        return res.status(500).json({error: 'Error update letter with music'})
+        return res.status(500).json({ error: 'Error updating letter with music' })
     }
 })
+
 
 // 자동 이메일 발송
 const sendEmails = async () => {
