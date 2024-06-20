@@ -166,7 +166,7 @@ router.get('/', async (req, res) => {
 router.get('/capsule', async (req, res) => {
     try {
         const capsules = await Letter.findAll({
-            attributes: ['capsule']
+            attributes: ['id','capsule']
         })
         return res.status(200).json(capsules)
     } catch (error) {
@@ -174,12 +174,47 @@ router.get('/capsule', async (req, res) => {
     }
 })
 
-//편지Id로 특정 편지 조회
-router.get('/:encryptedId', async (req, res) => {
+// 캡슐 ID로 이미지 조회
+router.get('/capsule/:id', async (req, res) => {
     try {
-        const encryptedLetterId = req.params.encryptedId;
-        const letterId = decrypt(encryptedLetterId); // 복호화하여 실제 letterId 얻기
-        const letter = await Letter.findByPk(letterId);
+        const { id } = req.params;
+        const capsule = await Letter.findOne({
+            where: { id },
+            attributes: ['id','capsule']
+        })
+
+        if (!capsule) {
+            return res.status(404).json({ error: 'Capsule not found' })
+        }
+
+        return res.status(200).json(capsule)
+    } catch (error) {
+        return res.status(500).json({ error: 'Error reading capsule by ID' })
+    }
+})
+
+
+// 최신 순으로 30개 캡슐 조회
+router.get('/capsules/latest', async (req, res) => {
+    try {
+        const capsules = await Letter.findAll({
+            limit: 30,
+            order: [['createdAt', 'DESC']],
+            attributes: ['id', 'capsule']
+        })
+        return res.status(200).json(capsules)
+    } catch (error) {
+        return res.status(500).json({ error: 'Error reading latest capsules' })
+    }
+})
+
+//편지Id로 특정 편지 조회
+router.get('/:id', async (req, res) => {
+    try {
+        // const encryptedLetterId = req.params.encryptedId;
+        // const letterId = decrypt(encryptedLetterId); // 복호화하여 실제 letterId 얻기
+        const {id}= req.params;
+        const letter = await Letter.findByPk(id);
         if (letter) {
             return res.status(200).json(letter)
         } else {
@@ -187,7 +222,6 @@ router.get('/:encryptedId', async (req, res) => {
         }
     } catch (error) {
         return res.status(500).json({ error: 'Error reading letter' })
-        console.log(error)
     }
 })
 
