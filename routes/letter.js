@@ -149,7 +149,7 @@ const sendEmails = async () => {
     }
 }
 
-cron.schedule('1 * * * * *', sendEmails);
+cron.schedule('1 0 0 1 1 *', sendEmails);
 
 
 //모든 편지 조회
@@ -171,6 +171,22 @@ router.get('/capsule', async (req, res) => {
         return res.status(200).json(capsules)
     } catch (error) {
         return res.status(500).json({ error: 'Error reading all capsuleImages' })
+    }
+})
+
+router.get('/recent', async (req, res) => {
+    try {
+        const recentLetter = await Letter.findOne({
+            order: [['id', 'DESC']]
+        });
+        if (recentLetter) {
+            return res.status(200).json(recentLetter);
+        } else {
+            return res.status(404).json({ error: 'No recent letter found' })
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Error retrieving the recent letter' })
     }
 })
 
